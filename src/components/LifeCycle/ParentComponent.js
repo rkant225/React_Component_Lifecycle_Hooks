@@ -1,47 +1,49 @@
 //ParentComponent
 import React from 'react';
 import ChildComponent from './ChildComponent';
-
+import ErrorBoundryHOC from './ErrorBoundryHOC';
 class ParentComponent extends React.Component{
 
     constructor(props){
-        //console.log('PARENT constructor')
+        console.log('PARENT constructor')
         super(props);
         this.state={fruit : 'mango', booleanValue : false}
     }
 
     static getDerivedStateFromProps(props, state){ // must be static
-        //console.log('PARENT getDerivedStateFromProps')
+        console.log('PARENT getDerivedStateFromProps')
         return null; // return "null" if you don't want any changes
     }
 
     componentDidMount(){
-        // console.log('PARENT componentDidMount')
-        // console.log("******************MOUNTING PHASE END********************")
-        // console.log("******************UPDATING PHASE START********************")
-        // console.log('Time taken to fetch data || PARENT : 2 sec. || CHILD : 3 sec. || GRAND_CHILD : 4 sec.')
-        //setTimeout(()=>this.setState({booleanValue : true}),2000)
+        console.log('PARENT componentDidMount')
+        console.log("******************MOUNTING PHASE END********************")
+        console.log("******************UPDATING PHASE START********************")
+        console.log('Time taken to fetch data || PARENT : 2 sec. || CHILD : 3 sec. || GRAND_CHILD : 4 sec.')
+        setTimeout(()=>this.setState({booleanValue : true}),2000)
     }
 
     shouldComponentUpdate(nextProps, nextState){
-        // console.log('PARENT shouldComponentUpdate');
-        // return false; // component's render method will not be called 
+        console.log('PARENT shouldComponentUpdate');
+        //return false; // component's render method will not be called 
         return true; // component's render method will be called 
     }
 
     render(){
-        // console.log('PARENT render')
+        console.log('PARENT render')
         return(
-            <div>
-                ParentComponent
-                <br/>
-                {this.state.booleanValue ? "TRUE" : "FALSE"}
-                <br/>
-                <button onClick={()=>this.setState({booleanValue : !this.state.booleanValue})}>Toggle boolean state</button>
-                <br/>
-                {"**************************************"}
-                <ChildComponent fruit={this.state.fruit}/>
-            </div>
+            <ErrorBoundryHOC>
+                <div>
+                    ParentComponent
+                    <br/>
+                    {this.state.booleanValue ? "TRUE" : "FALSE"}
+                    <br/>
+                    <button onClick={()=>this.setState({booleanValue : !this.state.booleanValue})}>Toggle boolean state</button>
+                    <br/>
+                    {"**************************************"}
+                    <ChildComponent fruit={this.state.fruit}/>
+                </div>
+            </ErrorBoundryHOC>
         );
     }
 }
@@ -191,7 +193,7 @@ export default ParentComponent;
     // 1. static getDerivedStateFromProps(props, state)
         // Firstly, the static getDerivedStateFromProps method is also invoked. That’s the first method to be invoked. I already explained this method in the mounting phase, so I’ll skip it.
         // What’s important to note is that this method is invoked in both the mounting and updating phases. The same method.
-    // 2. shouldComponentUpdate()
+    // 2. shouldComponentUpdate(nextProps, nextState)
         // As soon as the static getDerivedStateFromProps method is called, the shouldComponentUpdate method is called next.
         // By default, or in most cases, you’ll want a component to re-render when state or props changes. However, you do have control over this behavior.
         // Within this lifecycle method, you can return a boolean — true or false and control whether the component gets re-rendered or not i.e upon a change in state or props.
@@ -201,3 +203,110 @@ export default ParentComponent;
         // However, this is a very common use case, so you could use the built-in "PureComponent" when you don’t want a component to re-render if the stateand props don’t change.
     // 3. render()
         // After the "shouldComponentUpdate" method is called, render is called immediately afterwards, –> depending on the returned value from "shouldComponentUpdate" which defaults to true.
+    // 4. getSnapshotBeforeUpdate(prevProps, prevState)
+        // Right after the render method is called, the getSnapshotBeforeUpdatelifcycle method is called next.
+        // This comes handy specifically when you need to grab some information from the DOM (and potentially change it) just after an update is made.
+        // Here’s the important thing. The value queried from the DOM in getSnapshotBeforeUpdate will refer to the value just before the DOM is updated. Even though the render method was previously called.
+        // Actual updates to the DOM may be asynchronous, but the getSnapshotBeforeUpdate lifecycle method will always be called immediately before the DOM is updated.
+        // A classic example of where this lifecycle method may come in handy is in a chat application.
+        // The way the getSnapshotBeforeUpdate lifecycle method works is that when it is invoked, it gets passed the previous "props" and "state" as arguments.
+        // NOTE : Within this method, you’re expected to either return a value or null ex : // return value || null
+        // Whatever value is returned here is then passed on to another lifecycle method "componentDidUpdate"
+        
+            // constructor(props){
+            //     console.log('GRAND_CHILD constructor')
+            //     super(props);
+            //     this.state={toy : 'toy_car', fruit : 'banana', booleanValue : false, planets : ['mercury', 'veneus', 'earth', 'mars']}
+            //     this.planetThreadRef = React.createRef();
+            // }
+
+            // getSnapshotBeforeUpdate(prevProps,prevState){
+            //     console.log('GRAND_CHILD getSnapshotBeforeUpdate');
+            //     if(prevState.planets.length < this.state.planets.length){
+            //         const planetThreadRef  = this.planetThreadRef.current;
+            //         return {toBeScrolled : planetThreadRef.scrollHeight - planetThreadRef.scrollTop}
+            //     }
+            //     return null;                
+            // }
+
+    // 5. ­React updates ­D­O­M and refs
+
+    // 6. componentDidUpdate(prevProps, prevState, snapShot)
+        //This lifecycle method is invoked after the "getSnapshotBeforeUpdate" is invoked. As with the "getSnapshotBeforeUpdate" method it receives the previous "props" and "state" and Whatever value is returned from the getSnapshotBeforeUpdate lifecycle method is passed as the third argument to the "componentDidUpdate" method.
+            
+            // componentDidUpdate(prevProps,prevState,snapShot){
+            //     console.log('GRAND_CHILD componentDidUpdate');
+            //     if(snapShot && snapShot.toBeScrolled){
+            //         const planetThreadRef  = this.planetThreadRef.current;
+            //         planetThreadRef.scrollTop = planetThreadRef.scrollHeight - snapShot.toBeScrolled;
+            //     }
+            // }
+
+// UNMOUNTING PHASE
+    // 1. componentWillUnmount()
+    // The "componentWillUnmount" lifecycle method is invoked immediately before a component is unmounted and destroyed. 
+    // This is the ideal place to perform any necessary cleanup such as clearing up timers, cancelling network requests, or cleaning up any subscriptions that were created in componentDidMount() as shown below:
+    // e.g add event listener
+        // componentDidMount() {
+        //     el.addEventListener()
+        // }
+        // // e.g remove event listener 
+        // componentWillUnmount() {
+        //     el.removeEventListener()
+        //  }
+
+
+// ERROR HANDLING PHASE
+    // Sometimes things go bad, errors are thrown. The following methods are invoked when an error is thrown by a "descendant"(Child) component i.e a component below them.
+    // Let’s implement a simple component to catch errors in the demo app. For this, we’ll create a new component called ErrorBoundary.
+    
+    // 1. static getDerivedStateFromError(error)
+        // Whenever an error is thrown in a descendant component, this method is called first, and the error thrown passed as an argument.
+        // Whatever value is returned from this method is used to update the state of the component.
+            // static getDerivedStateFromError(error) {
+            //     console.log(`Error log from getDerivedStateFromError: ${error}`);
+            //     return { hasError: true };
+            //  }
+    // 2. componentDidCatch(error, errorInfo)
+        // The componentDidCatch method is also called after an error in a descendant component is thrown. Apart from the error thrown, it is passed one more argument which represents more information about the error
+        // In this method, you can send the error or info received to an external logging service. Unlike getDerivedStateFromError, the componentDidCatch allows for side-effects
+            // componentDidCatch(error, info) {
+            //     logToExternalService(error, info) // this is allowed. 
+            //         //Where logToExternalService may make an API call.
+            // }
+        // Final look of component
+            // static getDerivedStateFromError(error) {
+            //     console.log(`Error log from getDerivedStateFromError: ${error}`);
+            //     return { hasError: true };
+            //   }
+            
+            //   componentDidCatch(error, info) {
+            //     console.log(`Error log from componentDidCatch: ${error}`);
+            //     console.log(info);
+            //   }
+            
+            //   render() {
+            //     if (this.state.hasError) {
+            //         return <h1>Something went wrong.</h1>;
+            //       }
+              
+            //       return this.props.children;
+            //    }
+            // }
+            // export default ErrorBoundary;
+
+        // Usage:
+            // <ErrorBoundary>
+            //   <BuggyCOmponent />
+            // </ErrorBoundary> 
+
+        // Producing an error:
+        // componentDidMount() {
+        //     throw new Error("An error has occured in Buggy component!");
+        //     // or
+        //     console.log(this.props.dummy.toUpperCase()) // produces error, because we are accessing uppercase() on undefined value.
+        //  }  
+            
+            
+
+

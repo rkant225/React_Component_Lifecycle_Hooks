@@ -1,9 +1,14 @@
 .planetBox{
     border: 2px solid black;
-    width: 30%;
+    width: 360px;
     height: 300px; 
     overflow-y: scroll;
 }
+
+/* To remove scrollbar use this code */
+/* .planetBox::-webkit-scrollbar {
+    display: none;
+} */
 
 ul{
     list-style: none;

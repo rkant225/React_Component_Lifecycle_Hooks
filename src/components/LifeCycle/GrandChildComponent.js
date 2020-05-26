@@ -1,11 +1,12 @@
 //GrandChildComponent
 import React from 'react';
+import ErrorProducingComponent from './ErrorProducingComponent';
 
 class GrandChildComponent extends React.Component{
     constructor(props){
         console.log('GRAND_CHILD constructor')
         super(props);
-        this.state={toy : 'toy_car', fruit : 'banana', booleanValue : false, planets : ['mercury', 'veneus', 'earth', 'mars']}
+        this.state={toy : 'toy_car', fruit : 'banana', booleanValue : false, planets : ['mercury', 'veneus', 'earth', 'mars'], displayErrorComponent : false}
         this.planetThreadRef = React.createRef();
     }
 
@@ -21,7 +22,7 @@ class GrandChildComponent extends React.Component{
     }
 
     componentDidMount(){
-        console.log('GRAND_CHILD componentDidMount')
+        console.log('GRAND_CHILD componentDidMount');
         //setTimeout(()=>this.setState({booleanValue : true}),4000)
     }
 
@@ -48,10 +49,14 @@ class GrandChildComponent extends React.Component{
             planetThreadRef.scrollTop = planetThreadRef.scrollHeight - snapShot.toBeScrolled
         }
     }
+
+    componentWillUnmount(){
+        console.log('GRAND_CHILD componentWillUnmount');
+    }
     
 
     render(){
-        console.log('GRAND_CHILD render')
+        console.log('GRAND_CHILD render');
         return(
             <div>
                 GrandChildComponent 
@@ -67,6 +72,8 @@ class GrandChildComponent extends React.Component{
                     </ul>
                 </div>
                 <button onClick={this.handleAddPlanet}>Add planet</button>
+                <button onClick={()=>this.setState({displayErrorComponent : true})}>Display Error Component</button>
+                {this.state.displayErrorComponent && <ErrorProducingComponent/>}
             </div>
         );
     }
